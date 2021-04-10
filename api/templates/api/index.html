@@ -61,11 +61,11 @@
 
         <div>
             <span style="display: inline-block;">
-                data<br>dzień<br>noc<br>popołudnie<br>ranek<br>urlop
+                data<br>dzień<br>noc<br>popołudnie<br>ranek<br>urlop<br>nie może
                 </span>&nbsp;&nbsp;
         {% for day in days %}
             <span style="display: inline-block;">
-            {{ day.day }}<br>{{ day.users_day }}<br>{{ day.users_night }}<br>{{ day.users_afternoon }}<br>{{ day.users_morning }}<br>{{ day.holidays }}
+            {{ day.day }}<br>{{ day.users_day }}<br>{{ day.users_night }}<br>{{ day.users_afternoon }}<br>{{ day.users_morning }}<br>{{ day.holidays }}<br>{{ day.cannot_work }}
             </span>&nbsp;&nbsp;
         {% endfor %}
         </div>

@@ -45,7 +45,7 @@ def index(request):
         month, year = next_mouth(today.month, today.year)
         num_days = calendar.monthrange(year, month)[1]
         days = [{"day": datetime.date(year, month, day), "day_name": day, "users_morning": [], "users_day": [],
-                 "users_night": [], "users_afternoon": [], "holidays": []} for day in range(1, num_days + 1)]
+                 "users_night": [], "users_afternoon": [], "holidays": [], "cannot_work": []} for day in range(1, num_days + 1)]
         create_data(excel_data, worksheet, days, excel_data_holiday)
         while True:
             print("==========================================================================================================")
@@ -53,9 +53,9 @@ def index(request):
             print("==========================================================================================================")
             users = copy.deepcopy(excel_data)
             days_tmp = copy.deepcopy(days)
-            get_schedule(days_tmp, users, excel_data_holiday)
-            make_up_all_days(days_tmp, users, excel_data_holiday)
-            make_up_all_mornings(days_tmp, users, excel_data_holiday)
+            get_schedule(days_tmp, users, excel_data_holiday, excel_data_cannot_work)
+            make_up_all_days(days_tmp, users, excel_data_holiday, excel_data_cannot_work)
+            make_up_all_mornings(days_tmp, users, excel_data_holiday, excel_data_cannot_work)
             print("days_tmp")
             print(days_tmp)
             print("users")
@@ -91,6 +91,8 @@ def representant_data(days, users):
                 day_list.append("Ra")
             elif int(user['user_id']) in day['holidays']:
                 day_list.append("U")
+            elif int(user['user_id']) in day['cannot_work']:
+                day_list.append("X")
             else:
                 day_list.append(" ")
 
@@ -343,22 +345,29 @@ def check_user_8_4_hours(users, day, is_not_enought=False):
     return users_id
 
 
-def get_schedule(days, users, holidays):
+def get_schedule(days, users, holidays, cannot_work):
     for i, day in enumerate(days, start=0):
         users_data = users.copy()
         users_data.pop(0)
         available_users = users_data.copy()
         #TODO delete users from available users list for that day
-        holidays_user_id = []
+        user_id = []
         for key in holidays:
             if day['day_name'] in holidays[key]:
                 for user in available_users:
                     if user['username'] == key:
-                        holidays_user_id.append(int(user['user_id']))
+                        user_id.append(int(user['user_id']))
                         if int(user['user_id']) not in days[i]['holidays']:
                             days[i]['holidays'].append(int(user['user_id']))
+        for key in cannot_work:
+            if day['day_name'] in cannot_work[key]:
+                for user in available_users:
+                    if user['username'] == key:
+                        user_id.append(int(user['user_id']))
+                        if int(user['user_id']) not in days[i]['cannot_work']:
+                            days[i]['cannot_work'].append(int(user['user_id']))
 
-        delete_user(available_users, holidays_user_id)
+        delete_user(available_users, user_id)
         get_nights(day, i, days, users, available_users)
         get_days(day, i, days, users, available_users)
         get_afternoons(day, i, days, users, available_users)
@@ -366,7 +375,7 @@ def get_schedule(days, users, holidays):
         print(days)
 
 
-def make_up_all_days(days, users, holidays):
+def make_up_all_days(days, users, holidays, cannot_work):
     rols = 0
     while not check_12(users):
         rols = rols + 1
@@ -387,6 +396,14 @@ def make_up_all_days(days, users, holidays):
                                 holidays_user_id.append(int(user['user_id']))
                                 if int(user['user_id']) not in days[i]['holidays']:
                                     days[i]['holidays'].append(int(user['user_id']))
+
+                for key in cannot_work:
+                    if day['day_name'] in cannot_work[key]:
+                        for user in available_users:
+                            if user['username'] == key:
+                                holidays_user_id.append(int(user['user_id']))
+                                if int(user['user_id']) not in days[i]['cannot_work']:
+                                    days[i]['cannot_work'].append(int(user['user_id']))
 
                 users_delete_id = find_completed_users(available_users)
                 if rols > 50:
@@ -423,7 +440,7 @@ def make_up_all_days(days, users, holidays):
                     days[i]["users_day"].append(user_id)
 
 
-def make_up_all_mornings(days, users, holidays):
+def make_up_all_mornings(days, users, holidays, cannot_work):
     rols = 0
     while not check_8or4(users):
         rols = rols + 1
@@ -444,6 +461,14 @@ def make_up_all_mornings(days, users, holidays):
                                 holidays_user_id.append(int(user['user_id']))
                                 if int(user['user_id']) not in days[i]['holidays']:
                                     days[i]['holidays'].append(int(user['user_id']))
+
+                for key in cannot_work:
+                    if day['day_name'] in cannot_work[key]:
+                        for user in available_users:
+                            if user['username'] == key:
+                                holidays_user_id.append(int(user['user_id']))
+                                if int(user['user_id']) not in days[i]['cannot_work']:
+                                    days[i]['cannot_work'].append(int(user['user_id']))
 
                 # delete_user(available_users, holidays_user_id)
                 if rols > 50:
