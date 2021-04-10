@@ -5,3 +5,5 @@ venv
 data
 
 *.sqlite3
+
+.idea
