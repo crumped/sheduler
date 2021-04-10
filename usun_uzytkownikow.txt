@@ -1,0 +1,13 @@
+					USER 
+D - day
+N - night
+M - morning
+A - afternoon
+
+dzień-1 and dzień-2	dzień-1 and dzień+1	dzień+1 and dzień+2
+	D, N, M, A		D, N, M, A		D, N, M, A
+	
+	
+Case 1
+	
+	D, M, A

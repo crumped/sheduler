@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>
+            Print the excel
+        </title>
+        <style>
+            table, th, td {
+              border: 1px solid black;
+            }
+            td {
+              text-align: center;
+              vertical-align: middle;
+            }
+        </style>
+    </head>
+    <body style="margin-top: 30px;margin-left: 30px;">
+        <form action="{% url "api:index" %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file"
+                   title="Upload excel file"
+                   name="excel_file"
+                   style="border: 1px solid black; padding: 5px;"
+                   required="required">
+            <p>
+            <input type="submit"
+                   value="Upload"
+                   style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+        </form>
+
+        <p></p>
+        <hr>
+
+        <div style="margin: 20px;">
+            <table style="width:100%">
+              <tr>
+                <th>Lp</th>
+                <th>Nazwisko i Imię</th>
+                {% for day in days %}
+                    <th>{{ day.day_name }}</th>
+                {% endfor %}
+              </tr>
+            {% for r in representant %}
+              <tr>
+                {% for r2 in r %}
+                  <td>{{ r2 }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+            </table>
+        </div>
+
+        {% for cell in excel_data.0 %}
+                {{ cell }}&nbsp;&nbsp;
+        {% endfor %}
+            <br>
+
+        {% for row in excel_data %}
+                {{ row.user_id }}&nbsp;&nbsp;{{ row.username }}&nbsp;&nbsp;{{ row.total_hours }}&nbsp;&nbsp;{{ row.month }}&nbsp;&nbsp;
+                <br>
+            {% endfor %}
+
+        <div>
+            <span style="display: inline-block;">
+                data<br>dzień<br>noc<br>popołudnie<br>ranek<br>urlop
+                </span>&nbsp;&nbsp;
+        {% for day in days %}
+            <span style="display: inline-block;">
+            {{ day.day }}<br>{{ day.users_day }}<br>{{ day.users_night }}<br>{{ day.users_afternoon }}<br>{{ day.users_morning }}<br>{{ day.holidays }}
+            </span>&nbsp;&nbsp;
+        {% endfor %}
+        </div>
+    </body>
+</html>
